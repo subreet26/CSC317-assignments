@@ -14,9 +14,9 @@ let todos = [
 ];
 
 // GET /todos - Retrieve all to-do items
-app.get('/todos', (req, res) => {
-  res.json(todos);
-});
+//app.get('/todos', (req, res) => {
+//  res.json(todos);
+//});
 
 
 /* 
@@ -25,7 +25,15 @@ GET /todos - Retrieve all to-do items or filter by completed status.
 after completing this part, you need to comment out the GET end point 
 already implemented here to test this new GET endpoint! 
 */
-
+//Here is the new GET for Q3
+app.get('/todos', (req, res) => {
+  const { completed } = req.query;
+  if (completed !== undefined) {
+    const filteredTodos = todos.filter(todo => todo.completed.toString() === completed);
+    return res.json(filteredTodos);
+  }
+  res.json(todos);
+});
 
 
 // POST /todos - Add a new to-do item
@@ -34,6 +42,7 @@ app.post('/todos', (req, res) => {
     id: todos.length + 1,
     task: req.body.task,
     completed: false
+    priority: req.body.priority || "medium" //here is the updated priority line for Q1
   };
   todos.push(newTodo);
   res.status(201).json(newTodo);
@@ -48,6 +57,7 @@ app.put('/todos/:id', (req, res) => {
   }
   todo.task = req.body.task || todo.task;
   todo.completed = req.body.completed !== undefined ? req.body.completed : todo.completed;
+  todo.priority = req.body.priority || todo.priority; //update priority
   res.json(todo);
 });
 
@@ -56,7 +66,13 @@ Question 2: Implement a "Complete All" Endpoint
 example usage: 
 curl -X PUT http://localhost:3000/todos/complete-all
 */
-
+// Here is the new complete all PUT for Q2
+app.put('/todos/complete-all', (req, res) => {
+  todos.forEach(todo => {
+    todo.completed = true;
+  });
+  res.json({ message: "All to-do items marked as completed", todos });
+});
 
 // DELETE /todos/:id - Delete a to-do item
 app.delete('/todos/:id', (req, res) => {
